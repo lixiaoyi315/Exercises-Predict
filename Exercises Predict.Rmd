@@ -1,0 +1,50 @@
+---
+title: "Exercises Predict"
+author: "xiaoyi_Li"
+date: "2016Äê9ÔÂ8ÈÕ"
+output: html_document
+---
+#Question
+One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, our goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants.
+#Input Data
+```{r}
+setwd("d:/test data/homework")
+training<-read.csv("pml-training.csv",header = T,stringsAsFactors = F)
+testing<-read.csv("pml-testing.csv",header = T,stringsAsFactors = F)
+names(training)
+str(training)
+```
+
+#Data Preprocess
+```{r}
+library(caret,ggplot2)
+training1<-training[,-c(12:36,50:59,69:83,87:100)]
+training1<-training1[,-c(37,39:48,61:75,77:86)]
+set.seed(1111)
+ktraining<-createFolds(training1$X,k=10,list=TRUE,returnTrain=TRUE)
+sapply(ktraining,length)
+```
+
+#train the model
+in this project,we choose randomforest to fit the model;use the cross validation such as fold2 to test model1(fold1 fitted),fold4 to test model2(fold3 fitted),fold6 to test model3(fold5 fitted),fold8 to test model4(fold7 fitted),fold10 to test model5(fold9 fitted);use the confusion Matrix to compare the model expected out of sample error, then choose the min error which mode predict as the final model.
+```{r,cache=TRUE}
+modelFit1<-train(classe~.,data=training1[ktraining[[1]],-1],preProcess=c("center","scale"),method="rf")
+pred1<-predict(modelFit1,training1[ktraining[[2]],-1])
+modelFit2<-train(classe~.,data=training1[ktraining[[3]],-1],preProcess=c("center","scale"),method="rf")
+pred2<-predict(modelFit2,training1[ktraining[[4]],-1])
+modelFit3<-train(classe~.,data=training1[ktraining[[5]],-1],preProcess=c("center","scale"),method="rf")
+pred3<-predict(modelFit3,training1[ktraining[[6]],-1])
+modelFit4<-train(classe~.,data=training1[ktraining[[7]],-1],preProcess=c("center","scale"),method="rf")
+pred4<-predict(modelFit4,training1[ktraining[[8]],-1])
+modelFit5<-train(classe~.,data=training1[ktraining[[9]],-1],preProcess=c("center","scale"),method="rf")
+pred5<-predict(modelFit5,training1[ktraining[[10]],-1])
+confuse1<-confusionMatrix(pred1,training1[ktraining[[2]],60])
+confuse2<-confusionMatrix(pred2,training1[ktraining[[4]],60])
+confuse3<-confusionMatrix(pred3,training1[ktraining[[6]],60])
+confuse4<-confusionMatrix(pred4,training1[ktraining[[8]],60])
+confuse5<-confusionMatrix(pred5,training1[ktraining[[10]],60])
+pred<-predict(pred5,testing)
+```
+
+#predict results
+B A B A A E D B A A B C B A E E A B B B
