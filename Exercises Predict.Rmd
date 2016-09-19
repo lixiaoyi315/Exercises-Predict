@@ -20,6 +20,7 @@ str(training)
 library(caret,ggplot2)
 training1<-training[,-c(12:36,50:59,69:83,87:100)]
 training1<-training1[,-c(37,39:48,61:75,77:86)]
+training1<-training1[,-c(3:5,12:20,25:33,38:46,51:59)]
 set.seed(1111)
 ktraining<-createFolds(training1$X,k=10,list=TRUE,returnTrain=TRUE)
 sapply(ktraining,length)
@@ -38,12 +39,13 @@ modelFit4<-train(classe~.,data=training1[ktraining[[7]],-1],preProcess=c("center
 pred4<-predict(modelFit4,training1[ktraining[[8]],-1])
 modelFit5<-train(classe~.,data=training1[ktraining[[9]],-1],preProcess=c("center","scale"),method="rf")
 pred5<-predict(modelFit5,training1[ktraining[[10]],-1])
-confuse1<-confusionMatrix(pred1,training1[ktraining[[2]],60])
-confuse2<-confusionMatrix(pred2,training1[ktraining[[4]],60])
-confuse3<-confusionMatrix(pred3,training1[ktraining[[6]],60])
-confuse4<-confusionMatrix(pred4,training1[ktraining[[8]],60])
-confuse5<-confusionMatrix(pred5,training1[ktraining[[10]],60])
-pred<-predict(pred5,testing)
+confuse1<-confusionMatrix(pred1,training1[ktraining[[2]],21])
+confuse2<-confusionMatrix(pred2,training1[ktraining[[4]],21])
+confuse3<-confusionMatrix(pred3,training1[ktraining[[6]],21])
+confuse4<-confusionMatrix(pred4,training1[ktraining[[8]],21])
+confuse5<-confusionMatrix(pred5,training1[ktraining[[10]],21])
+#The top overall statictics' accuracy is 1(modelFit1),the other fit models accuracy is 0.9998, so use the modelFit1 to predict the test data
+pred<-predict(modelFit1,testing)
 ```
 
 #predict results
